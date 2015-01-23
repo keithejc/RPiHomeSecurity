@@ -25,7 +25,15 @@ namespace RPiHomeSecurity
 {
     public class Config
     {
+        public enum IoControllerTypes
+        {
+            RawGpio,
+            PifaceDigital
+        }
+
         private static String ConfigFileName = "config.cfg";
+
+        public IoControllerTypes IoControllerType { get; set; }
 
         public String SmtpServer { get; set; }
 
@@ -46,9 +54,13 @@ namespace RPiHomeSecurity
         public Dictionary<String, int> InputPins { get; set; }
 
         public int AlarmSirenDuration { get; set; }
-        public int WarningDuration  { get; set; }
+
+        public int WarningDuration { get; set; }
+
         public int WarningToggleOn { get; set; }
+
         public int WarningToggleOff { get; set; }
+
         public int ChimeDuration { get; set; }
 
         public Config()
@@ -63,6 +75,8 @@ namespace RPiHomeSecurity
             WarningToggleOn = 100;
             WarningToggleOff = 300;
             ChimeDuration = 100;
+
+            IoControllerType = IoControllerTypes.RawGpio;
 
             InputPins = new Dictionary<string, int>();
             InputPins.Add("Door", 3);
@@ -137,32 +151,5 @@ namespace RPiHomeSecurity
 
             return ret;
         }
-
-        //create outputPin classes from GPIO connector pin numbers
-        public Dictionary<string, IOutputPin> GetOutputPins()
-        {
-            var outputs = new Dictionary<String, IOutputPin>();
-
-            foreach (var output in OutputPins)
-            {
-                outputs.Add(output.Key, new GpioOutputPin(output.Value, output.Key));
-            }
-
-            return outputs;
-        }
-
-        //create inputPin classes from GPIO pin numbers
-        public Dictionary<string, IInputPin> GetInputPins()
-        {
-            var inputs = new Dictionary<String, IInputPin>();
-
-            foreach (var input in InputPins)
-            {
-                inputs.Add(input.Key, new GpioInputPin(input.Value, input.Key));
-            }
-
-            return inputs;
-        }
-
     }
 }

@@ -19,39 +19,25 @@ using Raspberry.IO.GeneralPurpose;
 
 namespace RPiHomeSecurity
 {
-    internal class GpioInputPin : IInputPin
+    internal class GpioInputPin : InputPin
     {
         private PinConfiguration pin;
 
         public PinConfiguration PinConfig { get { return pin; } }
 
-        public PinState Value { get; set; }
-        public String Name { get; set; }
-
-        //evant handler to call if the input changes
-        public event InputChangedEventHandler inputChangedEventHandler;
-
+        //setup the event handler for changes - using Raspberry.IO.GeneralPurpose library
         public GpioInputPin(int pinNumber, String name)
+            : base(pinNumber, name)
         {
-            Name = name;
             ConnectorPin gpioPin = GpioController.IntToConnectorPin(pinNumber);
             pin = gpioPin.Input()
                 .Name(gpioPin.ToString())
                 .OnStatusChanged(b =>
                 {
-                    OnInputChanged(b);
+                    InputChanged(b);
                 });
-        }
 
-        private void OnInputChanged(bool newValue)
-        {
-            log.LogDebugMessage("Input " + pin.Name + " changed to: " + (newValue ? "High" : "Low"));
-            Value = newValue ? PinState.High : PinState.Low;
-
-            if (inputChangedEventHandler != null)
-            {
-                inputChangedEventHandler.Invoke(this);
-            }
+            log.LogDebugMessage("Input " + name + " on " + gpioPin);
         }
-   }
+    }
 }

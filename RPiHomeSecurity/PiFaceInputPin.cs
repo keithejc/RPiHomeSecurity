@@ -18,12 +18,12 @@ using System;
 
 namespace RPiHomeSecurity
 {
-    public delegate void InputChangedEventHandler(IInputPin pin);
-
-    public interface IInputPin
+    internal class PiFaceInputPin : InputPin
     {
-        event InputChangedEventHandler inputChangedEventHandler;
-        String Name { get; set; }
-        PinState Value { get; set; }
+        //setup event handler for changed pin
+        public PiFaceInputPin(int pinNumber, String name)
+            : base(pinNumber, name)
+        {
+        }
     }
 }

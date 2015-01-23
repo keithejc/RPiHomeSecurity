@@ -88,12 +88,17 @@
   <ItemGroup>
     <Compile Include="Alarm.cs" />
     <Compile Include="Config.cs" />
-    <Compile Include="IInputPin.cs" />
+    <Compile Include="InputPin.cs" />
     <Compile Include="GpioController.cs" />
     <Compile Include="GpioInputPin.cs" />
-    <Compile Include="IOutputPin.cs" />
+    <Compile Include="IoController.cs" />
+    <Compile Include="IoControllerFactory.cs" />
+    <Compile Include="OutputPin.cs" />
     <Compile Include="log.cs" />
     <Compile Include="GpioOutputPin.cs" />
+    <Compile Include="PiFaceInputPin.cs" />
+    <Compile Include="PiFaceIoController.cs" />
+    <Compile Include="PiFaceOutputPin.cs" />
     <Compile Include="PinFileLock.cs" />
     <Compile Include="PinState.cs" />
     <Compile Include="Program.cs" />
@@ -115,6 +120,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <None Include="RPiHomeSecurity.licenseheader" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0">

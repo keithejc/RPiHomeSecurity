@@ -14,24 +14,17 @@
  * limitations under the License.
  ******************************************************************************/
 
+using System;
+using System.Collections.Generic;
+
 namespace RPiHomeSecurity
 {
-    //don't allow GPIO pins to be accessed at the same time
-    //used in input and output pin classes
-    public class PinFileLock
+    internal class PiFaceIoController : IoController
     {
-        private static readonly PinFileLock instance = new PinFileLock();
-
-        private PinFileLock()
+        //setup the PiFace driver with opur list of inputs and outputs
+        public PiFaceIoController(Dictionary<String, InputPin> inputs, Dictionary<String, OutputPin> outputs)
+            : base(inputs, outputs)
         {
-        }
-
-        public static PinFileLock Instance
-        {
-            get
-            {
-                return instance;
-            }
         }
     }
 }

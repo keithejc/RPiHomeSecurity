@@ -20,41 +20,26 @@ using Raspberry.IO.GeneralPurpose;
 
 namespace RPiHomeSecurity
 {
-    public class GpioController
+    public class GpioController : IoController
     {
-        public event InputChangedEventHandler inputChangedEventHandler;
-
-        //outputs
-        private Dictionary<String, IOutputPin> outputs;
-
-        public Dictionary<String, IOutputPin> Outputs { get { return outputs; } }
-
-        //inputs
-        private Dictionary<String, IInputPin> inputs;
-
-        public Dictionary<String, IInputPin> Inputs { get { return inputs; } }
-
         private GpioConnection connection;
 
-        //setup the GPIO driver with opur list of inputs and outputs
-        public GpioController(Config config)
+        //setup the Raspberry.IO.GeneralPurpose driver with opur list of inputs and outputs
+        public GpioController(Dictionary<String, InputPin> inputs, Dictionary<String, OutputPin> outputs)
+            : base(inputs, outputs)
         {
-            inputs = config.GetInputPins();
-            outputs = config.GetOutputPins();
-
             //outputs need to know the driver that is being used
             var driver = GpioConnectionSettings.DefaultDriver;
-            foreach (var output in outputs)
+            foreach (var output in Outputs)
             {
                 ((GpioOutputPin)(output.Value)).Driver = driver;
             }
 
             //connection needs to know the list of inputs we setup
             connection = new GpioConnection();
-            foreach (var input in inputs)
+            foreach (var input in Inputs)
             {
                 input.Value.inputChangedEventHandler += new InputChangedEventHandler(InputChanged);
-
                 connection.Add(((GpioInputPin)input.Value).PinConfig);
             }
         }
@@ -62,42 +47,6 @@ namespace RPiHomeSecurity
         ~GpioController()
         {
             connection.Close();
-        }
-
-        //one of the inputs changed - pass event on
-        public void InputChanged(IInputPin pin)
-        {
-            if (inputChangedEventHandler != null)
-            {
-                inputChangedEventHandler.Invoke(pin);
-            }
-        }
-
-        public void Toggle(String name, int msOnTime, int msOffTime, int numToggles)
-        {
-            IOutputPin outPin = outputs[name];
-            if (outPin != null)
-            {
-                outPin.Toggle(msOnTime, msOffTime, numToggles);
-            }
-        }
-
-        public void TurnOnOutput(String name, int msDuration)
-        {
-            IOutputPin outPin = outputs[name];
-            if (outPin != null)
-            {
-                outPin.TurnOn(msDuration);
-            }
-        }
-
-        public void TurnOffOutput(String name)
-        {
-            IOutputPin outPin = outputs[name];
-            if (outPin != null)
-            {
-                outPin.TurnOff();
-            }
         }
 
         //gpio pin header number to enum

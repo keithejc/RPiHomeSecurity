@@ -20,21 +20,20 @@ using System.Net.Mail;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel.Web;
-using RpHsWebServiceLib;
 using System.Timers;
+using RpHsWebServiceLib;
 
 namespace RPiHomeSecurity
 {
     public class Alarm
     {
+        public bool Armed { get; set; }
 
-        public bool Armed{ get; set;}
         public bool Alarmed { get; set; }
+
         public bool Warning { get; set; }
 
-        private GpioController ioBoard;
-
-        public GpioController IoBoard { get; set; }
+        public IoController IoBoard { get; set; }
 
         private Config config;
 
@@ -54,8 +53,8 @@ namespace RPiHomeSecurity
             //get configuration
             config = configuration;
 
-            ioBoard = new GpioController(config);
-            ioBoard.inputChangedEventHandler += new InputChangedEventHandler(InputHandler);
+            IoBoard = IoControllerFactory.CreateIoController(config);
+            IoBoard.inputChangedEventHandler += new InputChangedEventHandler(InputHandler);
 
             SendEmail("Start", "");
             log.LogDebugMessage("Rpi Home Security Ready...");
@@ -78,7 +77,6 @@ namespace RPiHomeSecurity
             }
 
             Arm(true);
-
         }
 
         ~Alarm()
@@ -146,7 +144,7 @@ namespace RPiHomeSecurity
             }
         }
 
-        //in the warning state, if not disarmed within 
+        //in the warning state, if not disarmed within
         //warningtime then go into alarm
         private void SetWarning(bool isOn)
         {
@@ -155,19 +153,17 @@ namespace RPiHomeSecurity
             if (isOn)
             {
                 int numToggles = config.WarningDuration / (config.WarningToggleOn + config.WarningToggleOff);
-                ioBoard.Toggle("Siren", config.WarningToggleOn, config.WarningToggleOff, numToggles);
+                IoBoard.Toggle("Siren", config.WarningToggleOn, config.WarningToggleOff, numToggles);
 
                 warningTimer.Interval = config.WarningDuration;
                 warningTimer.Start();
-
             }
             else
             {
-                ioBoard.TurnOffOutput("Siren");
+                IoBoard.TurnOffOutput("Siren");
 
                 warningTimer.Stop();
             }
-
         }
 
         //waring timer has elapsed - go into alarm
@@ -177,19 +173,18 @@ namespace RPiHomeSecurity
             AlarmOn(true);
         }
 
-
         //go into alarm state
         private void AlarmOn(bool isOn)
         {
             Alarmed = isOn;
             if (isOn)
             {
-                ioBoard.TurnOnOutput("Siren", config.AlarmSirenDuration);
+                IoBoard.TurnOnOutput("Siren", config.AlarmSirenDuration);
                 SendEmail("Alarm", "");
             }
             else
             {
-                ioBoard.TurnOffOutput("Siren");
+                IoBoard.TurnOffOutput("Siren");
             }
         }
 
@@ -202,19 +197,18 @@ namespace RPiHomeSecurity
             Armed = armed;
             if (armed)
             {
-
                 //check door isn't already on
-                if (ioBoard.Inputs["Door"].Value == PinState.High)
+                if (IoBoard.Inputs["Door"].Value == PinState.High)
                 {
                     //sound warning if it is
-                    ioBoard.TurnOnOutput("Siren", config.WarningDuration);
+                    IoBoard.TurnOnOutput("Siren", config.WarningDuration);
 
                     log.LogDebugMessage("Armed but door already open");
                 }
                 else
                 {
-                    ioBoard.TurnOnOutput("Light", 1000);
-                    ioBoard.Toggle("Siren", config.ChimeDuration, 200, 10);
+                    IoBoard.TurnOnOutput("Light", 1000);
+                    IoBoard.Toggle("Siren", config.ChimeDuration, 200, 10);
 
                     log.LogDebugMessage("Armed");
                 }
@@ -222,15 +216,14 @@ namespace RPiHomeSecurity
             else
             {
                 log.LogDebugMessage("DisArmed");
-                ioBoard.TurnOnOutput("Light", 5000);
+                IoBoard.TurnOnOutput("Light", 5000);
 
-                ioBoard.Toggle("Siren", config.ChimeDuration, 500, 2);
+                IoBoard.Toggle("Siren", config.ChimeDuration, 500, 2);
             }
         }
 
-
         //does all the handling of input changes
-        private void InputHandler(IInputPin inputPin)
+        private void InputHandler(InputPin inputPin)
         {
             try
             {
@@ -277,11 +270,11 @@ namespace RPiHomeSecurity
         //handle turned- sound warning and email user
         private void HandleTurned()
         {
-            ioBoard.TurnOnOutput("Light", config.WarningDuration);
+            IoBoard.TurnOnOutput("Light", config.WarningDuration);
 
             if (Armed && Alarmed == false && Warning == false)
             {
-                ioBoard.Toggle("Siren", config.ChimeDuration, 500, 5);
+                IoBoard.Toggle("Siren", config.ChimeDuration, 500, 5);
                 SendEmail("Handle", "");
             }
         }

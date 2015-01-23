@@ -15,13 +15,24 @@
  ******************************************************************************/
 
 using System;
+
 namespace RPiHomeSecurity
 {
-    public interface IOutputPin
+    internal class PiFaceOutputPin : OutputPin
     {
-        String Name { get; set; }
-        void TurnOff();
-        void TurnOn(int msDuration);
-        void Toggle(int msOnTime, int msOffTime, int numToggles);
+        public PiFaceOutputPin(int pinNumber, String name)
+            : base(pinNumber, name)
+        {
+        }
+
+        protected override void OutputOn()
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void OutputOff()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

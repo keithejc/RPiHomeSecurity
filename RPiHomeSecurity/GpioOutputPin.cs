@@ -15,15 +15,13 @@
  ******************************************************************************/
 
 using System;
-using System.Timers;
 using Raspberry.IO.GeneralPurpose;
 
 namespace RPiHomeSecurity
 {
-    internal class GpioOutputPin : IOutputPin
+    internal class GpioOutputPin : OutputPin
     {
         private IGpioConnectionDriver driver;
-        public String Name { get; set; }
 
         public IGpioConnectionDriver Driver
         {
@@ -37,28 +35,13 @@ namespace RPiHomeSecurity
         private ConnectorPin connectorPin;
         private ProcessorPin processorPin;
 
-        private System.Timers.Timer offTimer;
-        private System.Timers.Timer toggleTimer;
-        private int numToggles;
-        private int msToggleOnTime;
-        private int msToggleOffTime;
-        private bool isToggleOutputOn;
-
         public GpioOutputPin(int pinNumber, String name)
+            : base(pinNumber, name)
         {
-            Name = name;
             connectorPin = GpioController.IntToConnectorPin(pinNumber);
             processorPin = connectorPin.ToProcessor();
 
-            offTimer = new System.Timers.Timer();
-            offTimer.Elapsed += OffTimerElapsed;
-            offTimer.AutoReset = false;
-
-            toggleTimer = new System.Timers.Timer();
-            toggleTimer.Elapsed += ToggleTimerElapsed;
-            toggleTimer.AutoReset = false;
-            numToggles = 0;
-            
+            log.LogDebugMessage("Output " + name + " on " + connectorPin);
         }
 
         ~GpioOutputPin()
@@ -67,41 +50,9 @@ namespace RPiHomeSecurity
             driver.Release(processorPin);
         }
 
-
-        //toggles the output for a number of toggles
-        //typically for alarm siren warning
-        public void Toggle(int msOnTime, int msOffTime, int numToggles)
+        //turn on the output using Raspberry.IO.GeneralPurpose library
+        protected override void OutputOn()
         {
-            this.numToggles = numToggles;
-            isToggleOutputOn = true;
-
-            msToggleOnTime = msOnTime;
-            msToggleOffTime = msOffTime;
-
-            toggleTimer.Interval = msOnTime;
-            toggleTimer.Start();
-        }
-
-
-        //turn on the output for a length of time
-        //or 0 == indefinitely
-        public void TurnOn(int msDuration)
-        {
-            if (msDuration > 0)
-            {
-                offTimer.Interval = msDuration;
-                offTimer.Start();
-            }
-
-            OutputOn();
-        }
-
-        private void OutputOn()
-        {
-
-            //if output is toggling - stop that
-            toggleTimer.Stop();
-
             //don't allow GPIO pins to be accessed at the same time
             lock (PinFileLock.Instance)
             {
@@ -117,49 +68,8 @@ namespace RPiHomeSecurity
             }
         }
 
-        //the timer's elapsed - turn on / off the output or finish
-        private void ToggleTimerElapsed(object sender, ElapsedEventArgs e)
-        {
-            if (isToggleOutputOn)
-            {
-                TurnOff();
-                numToggles--;
-            }
-           
-            if (numToggles >= 0)
-            {
-                if (isToggleOutputOn)
-                {
-                    toggleTimer.Interval = msToggleOffTime;
-                    toggleTimer.Start();
-                }
-                else
-                {
-                    OutputOn();
-                    toggleTimer.Interval = msToggleOnTime;
-                    toggleTimer.Start();
-                }
-
-                isToggleOutputOn = !isToggleOutputOn;
-            }
-        }
-
-        //the timer's elapsed - turn off the output
-        private void OffTimerElapsed(object sender, ElapsedEventArgs e)
-        {
-            TurnOff();
-        }
-
-        //turn off the output
-        public void TurnOff()
-        {
-            offTimer.Stop();
-            toggleTimer.Stop();
-
-            OutputOff();
-        }
-
-        private void OutputOff()
+        //turn off the output using Raspberry.IO.GeneralPurpose library
+        protected override void OutputOff()
         {
             //don't allow GPIO pins to be accessed at the same time
             lock (PinFileLock.Instance)
@@ -174,7 +84,6 @@ namespace RPiHomeSecurity
                     log.LogError("Failed to turn Off " + connectorPin.ToString() + " Error: " + e.ToString());
                 }
             }
-
         }
     }
 }

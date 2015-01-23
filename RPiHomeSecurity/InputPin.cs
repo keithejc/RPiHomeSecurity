@@ -14,23 +14,38 @@
  * limitations under the License.
  ******************************************************************************/
 
+using System;
+
 namespace RPiHomeSecurity
 {
-    //don't allow GPIO pins to be accessed at the same time
-    //used in input and output pin classes
-    public class PinFileLock
-    {
-        private static readonly PinFileLock instance = new PinFileLock();
+    public delegate void InputChangedEventHandler(InputPin pin);
 
-        private PinFileLock()
+    public abstract class InputPin
+    {
+        //event handler to call if the input changes
+        public event InputChangedEventHandler inputChangedEventHandler;
+
+        public String Name { get; set; }
+
+        public PinState Value { get; set; }
+
+        private int PinNumber { get; set; }
+
+        public InputPin(int pinNumber, String name)
         {
+            Name = name;
+            PinNumber = pinNumber;
         }
 
-        public static PinFileLock Instance
+        //call this when the hardware input changes
+        protected void InputChanged(bool newValue)
         {
-            get
+            log.LogDebugMessage("Input " + Name + " changed to: " + (newValue ? "High" : "Low"));
+            Value = newValue ? PinState.High : PinState.Low;
+
+            if (inputChangedEventHandler != null)
             {
-                return instance;
+                inputChangedEventHandler.Invoke(this);
             }
         }
     }
