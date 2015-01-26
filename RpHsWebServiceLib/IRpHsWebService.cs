@@ -23,11 +23,11 @@ namespace RpHsWebServiceLib
     public interface IRpHsWebService
     {
         [OperationContract]
-        [WebInvoke(UriTemplate = Routing.SetArmedRoute,
+        [WebInvoke(UriTemplate = Routing.RunActionListRoute,
             BodyStyle = WebMessageBodyStyle.WrappedRequest,
             RequestFormat = WebMessageFormat.Json,
             ResponseFormat = WebMessageFormat.Json)]
-        bool SetArmed(bool armed);
+        bool RunActionList(string actionListName);
 
         [OperationContract]
         [WebGet(UriTemplate = Routing.GetStatusRoute, BodyStyle = WebMessageBodyStyle.Bare, ResponseFormat = WebMessageFormat.Json)]

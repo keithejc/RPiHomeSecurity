@@ -86,8 +86,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Actions\Action.cs" />
     <Compile Include="Alarm.cs" />
     <Compile Include="Config.cs" />
+    <Compile Include="Actions\EmailAction.cs" />
+    <Compile Include="Triggers\AlarmStateTrigger.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Triggers\ArmStateTrigger.cs" />
     <Compile Include="InputPin.cs" />
     <Compile Include="GpioController.cs" />
     <Compile Include="GpioInputPin.cs" />
@@ -96,6 +102,7 @@
     <Compile Include="OutputPin.cs" />
     <Compile Include="log.cs" />
     <Compile Include="GpioOutputPin.cs" />
+    <Compile Include="Actions\PauseAction.cs" />
     <Compile Include="PiFaceInputPin.cs" />
     <Compile Include="PiFaceIoController.cs" />
     <Compile Include="PiFaceOutputPin.cs" />
@@ -108,7 +115,16 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="Actions\SetAlarmStateAction.cs" />
+    <Compile Include="Actions\SetArmStateAction.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="Actions\ToggleOutputAction.cs" />
+    <Compile Include="Actions\TurnOffOutputAction.cs" />
+    <Compile Include="Actions\TurnOnOutputAction.cs" />
+    <Compile Include="Triggers\InputStateDelayedTrigger.cs" />
+    <Compile Include="Triggers\InputStateTrigger.cs" />
+    <Compile Include="Triggers\Trigger.cs" />
+    <Compile Include="Triggers\TriggerList.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

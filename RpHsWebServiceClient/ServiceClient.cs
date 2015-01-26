@@ -11,13 +11,13 @@ namespace HSControl
     {
         private static String baseAddress = "http://192.168.1.131:33331/RpHsWebService/";
 
-        public static String Arm(bool armed)
+        public static String RunActionList(String actionList)
         {
-            HttpWebRequest req = (HttpWebRequest)WebRequest.Create(baseAddress + "ArmedSet");
+            HttpWebRequest req = (HttpWebRequest)WebRequest.Create(baseAddress + "RunActionList");
             req.Method = "POST";
             req.ContentType = @"application/json; charset=utf-8";
 
-            String body = "{\"armed\":\"" + (armed ? "true" : "false") + "\"}";
+            String body = "{\"actionListName\":\"" + actionList + "\"}";
             byte[] data = Encoding.UTF8.GetBytes(body);
 
             Stream dataStream = req.GetRequestStream();

@@ -18,8 +18,7 @@ namespace RpHsWebServiceLib
 {
     public static class Routing
     {
-        public const string GetArmedRoute = "/ArmedGet";
-        public const string SetArmedRoute = "/ArmedSet";
+        public const string RunActionListRoute = "/RunActionList";
         public const string GetStatusRoute = "/Status";
     }
 }

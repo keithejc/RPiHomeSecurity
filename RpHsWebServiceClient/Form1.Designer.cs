@@ -29,30 +29,20 @@
         private void InitializeComponent()
         {
             this.buttonArm = new System.Windows.Forms.Button();
-            this.checkBoxArmed = new System.Windows.Forms.CheckBox();
             this.labelResponse = new System.Windows.Forms.Label();
             this.buttonGetArmed = new System.Windows.Forms.Button();
+            this.comboBoxActionLists = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // buttonArm
             // 
-            this.buttonArm.Location = new System.Drawing.Point(49, 46);
+            this.buttonArm.Location = new System.Drawing.Point(49, 12);
             this.buttonArm.Name = "buttonArm";
-            this.buttonArm.Size = new System.Drawing.Size(75, 23);
+            this.buttonArm.Size = new System.Drawing.Size(95, 23);
             this.buttonArm.TabIndex = 0;
-            this.buttonArm.Text = "Arm";
+            this.buttonArm.Text = "RunActionList";
             this.buttonArm.UseVisualStyleBackColor = true;
             this.buttonArm.Click += new System.EventHandler(this.buttonArm_Click);
-            // 
-            // checkBoxArmed
-            // 
-            this.checkBoxArmed.AutoSize = true;
-            this.checkBoxArmed.Location = new System.Drawing.Point(148, 46);
-            this.checkBoxArmed.Name = "checkBoxArmed";
-            this.checkBoxArmed.Size = new System.Drawing.Size(56, 17);
-            this.checkBoxArmed.TabIndex = 1;
-            this.checkBoxArmed.Text = "Armed";
-            this.checkBoxArmed.UseVisualStyleBackColor = true;
             // 
             // labelResponse
             // 
@@ -64,36 +54,50 @@
             // 
             // buttonGetArmed
             // 
-            this.buttonGetArmed.Location = new System.Drawing.Point(49, 76);
+            this.buttonGetArmed.Location = new System.Drawing.Point(49, 68);
             this.buttonGetArmed.Name = "buttonGetArmed";
             this.buttonGetArmed.Size = new System.Drawing.Size(75, 23);
             this.buttonGetArmed.TabIndex = 3;
-            this.buttonGetArmed.Text = "GetArmed";
+            this.buttonGetArmed.Text = "Get Status";
             this.buttonGetArmed.UseVisualStyleBackColor = true;
             this.buttonGetArmed.Click += new System.EventHandler(this.buttonGetArmed_Click);
+            // 
+            // comboBoxActionLists
+            // 
+            this.comboBoxActionLists.FormattingEnabled = true;
+            this.comboBoxActionLists.Items.AddRange(new object[] {
+            "Arm",
+            "Disarm",
+            "HandleWhileArmed",
+            "HandleWhileDisarmed",
+            "Startup",
+            "Alarm"});
+            this.comboBoxActionLists.Location = new System.Drawing.Point(160, 13);
+            this.comboBoxActionLists.Name = "comboBoxActionLists";
+            this.comboBoxActionLists.Size = new System.Drawing.Size(121, 21);
+            this.comboBoxActionLists.TabIndex = 4;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(284, 261);
+            this.Controls.Add(this.comboBoxActionLists);
             this.Controls.Add(this.buttonGetArmed);
             this.Controls.Add(this.labelResponse);
-            this.Controls.Add(this.checkBoxArmed);
             this.Controls.Add(this.buttonArm);
             this.Name = "Form1";
             this.Text = "Form1";
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
 
         private System.Windows.Forms.Button buttonArm;
-        private System.Windows.Forms.CheckBox checkBoxArmed;
         private System.Windows.Forms.Label labelResponse;
         private System.Windows.Forms.Button buttonGetArmed;
+        private System.Windows.Forms.ComboBox comboBoxActionLists;
     }
 }
 

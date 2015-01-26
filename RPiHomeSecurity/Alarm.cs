@@ -15,6 +15,7 @@
  ******************************************************************************/
 
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Mail;
 using System.Net.Security;
@@ -31,32 +32,29 @@ namespace RPiHomeSecurity
 
         public bool Alarmed { get; set; }
 
-        public bool Warning { get; set; }
-
         public IoController IoBoard { get; set; }
 
-        private Config config;
+        public Config Config { get; set; }
 
         private WebServiceHost _serviceHost;
         private RpHsWebService rpHsWebService;
-        private System.Timers.Timer warningTimer;
 
         //setup the alarm system
         public Alarm(Config configuration)
         {
-            Warning = false;
             Alarmed = false;
 
-            warningTimer = new System.Timers.Timer();
-            warningTimer.Elapsed += WarningTimerElapsed;
-
             //get configuration
-            config = configuration;
+            Config = configuration;
 
-            IoBoard = IoControllerFactory.CreateIoController(config);
-            IoBoard.inputChangedEventHandler += new InputChangedEventHandler(InputHandler);
+            //get the io controller we're going to use
+            IoBoard = IoControllerFactory.CreateIoController(Config);
 
-            SendEmail("Start", "");
+            //make sure the triggers are started
+            InitialiseTriggers();
+
+            //run the startup actions
+            RunActionList(Config.StartupActionListName);
             log.LogDebugMessage("Rpi Home Security Ready...");
 
             //start web service
@@ -65,18 +63,16 @@ namespace RPiHomeSecurity
             {
                 rpHsWebService = new RpHsWebService();
                 rpHsWebService.getStatusEventHandler += new RpHsWebService.GetStatusEventHandler(GetStatus);
-                rpHsWebService.setArmedEventHandler += new RpHsWebService.SetArmedEventHandler(Arm);
-                log.LogDebugMessage("Web Service binding to: " + ipAddress.ToString() + ":" + config.WebInterfacePort);
+                rpHsWebService.runActionListEventHandler += new RpHsWebService.RunActionListEventHandler(RunActionList);
+                log.LogDebugMessage("Web Service binding to: " + ipAddress.ToString() + ":" + Config.WebInterfacePort);
 
-                _serviceHost = new WebServiceHost(rpHsWebService, new Uri("http://" + ipAddress.ToString() + ":" + config.WebInterfacePort + "/RpHsWebService"));
+                _serviceHost = new WebServiceHost(rpHsWebService, new Uri("http://" + ipAddress.ToString() + ":" + Config.WebInterfacePort + "/RpHsWebService"));
                 _serviceHost.Open();
             }
             else
             {
                 log.LogError("Failed to get ip address of this device, no web interface available");
             }
-
-            Arm(true);
         }
 
         ~Alarm()
@@ -85,197 +81,48 @@ namespace RPiHomeSecurity
         }
 
         //callback for the web service
-        public bool GetArmed()
-        {
-            return Armed;
-        }
-
-        //callback for the web service
         private AlarmStatus GetStatus()
         {
             return new AlarmStatus() { Armed = this.Armed, InAlarm = this.Alarmed };
         }
 
-        //send an email
-        public void SendEmail(String subject, String body)
+        public InputPin GetInputPin(string name)
         {
-            try
+            return IoBoard.Inputs[name];
+        }
+
+        //get the outputpin from the name
+        public OutputPin GetOutputPin(String name)
+        {
+            return IoBoard.Outputs[name];
+        }
+
+        //link all triggers to this alarmcontroller and make them set themselves up to start triggering
+        private void InitialiseTriggers()
+        {
+            foreach (var triggerList in Config.TriggerLists)
             {
-                log.LogDebugMessage("Send email: '" + subject + "' to " + config.EmailAddress);
-
-                String toAddress = config.EmailAddress;
-                MailAddress from = new MailAddress(config.SmtpFromAddress);
-                MailAddress to = new MailAddress(toAddress);
-
-                string fromPassword = config.SmtpPassword;
-                var smtpClient = new SmtpClient
-                {
-                    Host = config.SmtpServer,
-                    Port = 587,
-                    EnableSsl = true,
-                    DeliveryMethod = SmtpDeliveryMethod.Network,
-                    UseDefaultCredentials = false,
-                    Credentials = new NetworkCredential(from.Address, fromPassword)
-                };
-                ServicePointManager.ServerCertificateValidationCallback =
-                    delegate(object s, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
-                    { return true; };
-
-                MailMessage msg = new MailMessage(from, to)
-                {
-                    Subject = subject,
-                    Body = DateTime.Now.ToLongDateString() + Environment.NewLine +
-                    DateTime.Now.ToLongTimeString() + Environment.NewLine +
-                    config.EmailBody + Environment.NewLine +
-                    body
-                };
-
-                smtpClient.SendCompleted += (s, e) =>
-                {
-                    smtpClient.Dispose();
-                    msg.Dispose();
-                };
-
-                smtpClient.SendAsync(msg, null);
-            }
-            catch (Exception e)
-            {
-                log.LogError("Error sending email: " + e.ToString());
+                triggerList.Value.Initialise(this);
             }
         }
 
-        //in the warning state, if not disarmed within
-        //warningtime then go into alarm
-        private void SetWarning(bool isOn)
+        private void SendEmail(String subject, String body)
         {
-            Warning = isOn;
-
-            if (isOn)
-            {
-                int numToggles = config.WarningDuration / (config.WarningToggleOn + config.WarningToggleOff);
-                IoBoard.Toggle("Siren", config.WarningToggleOn, config.WarningToggleOff, numToggles);
-
-                warningTimer.Interval = config.WarningDuration;
-                warningTimer.Start();
-            }
-            else
-            {
-                IoBoard.TurnOffOutput("Siren");
-
-                warningTimer.Stop();
-            }
+            new EmailAction(subject, body).RunAction(this);
         }
 
-        //waring timer has elapsed - go into alarm
-        private void WarningTimerElapsed(object sender, ElapsedEventArgs e)
+        //run a series of actions
+        public void RunActionList(String actionList)
         {
-            SetWarning(false);
-            AlarmOn(true);
-        }
-
-        //go into alarm state
-        private void AlarmOn(bool isOn)
-        {
-            Alarmed = isOn;
-            if (isOn)
+            List<Action> actions = Config.ActionLists[actionList];
+            if (actions != null)
             {
-                IoBoard.TurnOnOutput("Siren", config.AlarmSirenDuration);
-                SendEmail("Alarm", "");
-            }
-            else
-            {
-                IoBoard.TurnOffOutput("Siren");
-            }
-        }
+                log.LogDebugMessage("Running action list: " + actionList);
 
-        //arm/disarm
-        private void Arm(bool armed)
-        {
-            SetWarning(false);
-            AlarmOn(false);
-
-            Armed = armed;
-            if (armed)
-            {
-                //check door isn't already on
-                if (IoBoard.Inputs["Door"].Value == PinState.High)
+                foreach (var action in actions)
                 {
-                    //sound warning if it is
-                    IoBoard.TurnOnOutput("Siren", config.WarningDuration);
-
-                    log.LogDebugMessage("Armed but door already open");
+                    action.RunAction(this);
                 }
-                else
-                {
-                    IoBoard.TurnOnOutput("Light", 1000);
-                    IoBoard.Toggle("Siren", config.ChimeDuration, 200, 10);
-
-                    log.LogDebugMessage("Armed");
-                }
-            }
-            else
-            {
-                log.LogDebugMessage("DisArmed");
-                IoBoard.TurnOnOutput("Light", 5000);
-
-                IoBoard.Toggle("Siren", config.ChimeDuration, 500, 2);
-            }
-        }
-
-        //does all the handling of input changes
-        private void InputHandler(InputPin inputPin)
-        {
-            try
-            {
-                var pinState = inputPin.Value;
-                log.LogDebugMessage(inputPin.Name);
-
-                //alarm, siren, alert user
-                if (inputPin.Name == "Door" && pinState == PinState.High && Armed == true && Alarmed == false && Warning == false)
-                {
-                    SetWarning(true);
-                }
-
-                //handle - turn on light, chirp siren, alert user
-                if (inputPin.Name == "Handle" && pinState == PinState.High)
-                {
-                    HandleTurned();
-                }
-
-                //arm
-                if (inputPin.Name == "Arm" && pinState == PinState.Low)
-                {
-                    Arm(true);
-                }
-
-                //disarm
-                if (inputPin.Name == "DisArm" && pinState == PinState.Low)
-                {
-                    Arm(false);
-                }
-
-                //power supply fail, alert user
-                if (inputPin.Name == "MainsOk" && pinState == PinState.High)
-                {
-                    SendEmail("PowerFail", "");
-                }
-            }
-            catch (Exception e)
-            {
-                log.LogError("Alarm loop error, ended: " + e.ToString());
-                SendEmail("Alarm loop error", "Error details " + e.ToString());
-            }
-        }
-
-        //handle turned- sound warning and email user
-        private void HandleTurned()
-        {
-            IoBoard.TurnOnOutput("Light", config.WarningDuration);
-
-            if (Armed && Alarmed == false && Warning == false)
-            {
-                IoBoard.Toggle("Siren", config.ChimeDuration, 500, 5);
-                SendEmail("Handle", "");
             }
         }
     }

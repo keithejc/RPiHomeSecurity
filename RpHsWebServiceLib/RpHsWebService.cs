@@ -24,26 +24,26 @@ namespace RpHsWebServiceLib
     [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
     public class RpHsWebService : IRpHsWebService
     {
-        public delegate void SetArmedEventHandler(bool armed);
+        public delegate void RunActionListEventHandler(String actionListName);
 
-        public event SetArmedEventHandler setArmedEventHandler;
+        public event RunActionListEventHandler runActionListEventHandler;
 
         public delegate AlarmStatus GetStatusEventHandler();
 
         public event GetStatusEventHandler getStatusEventHandler;
 
-        public bool SetArmed(bool armed)
+        public bool RunActionList(String actionListName)
         {
-            if (setArmedEventHandler != null)
+            if (runActionListEventHandler != null)
             {
-                setArmedEventHandler.Invoke(armed);
+                runActionListEventHandler.Invoke(actionListName);
             }
             else
             {
-                throw new InvalidOperationException("setArmedEventHandler Callback not setup in RpHsWebService");
+                throw new InvalidOperationException("RunActionListEventHandler Callback not setup in RpHsWebService");
             }
 
-            return armed;
+            return true;
         }
 
         public AlarmStatus GetStatus()

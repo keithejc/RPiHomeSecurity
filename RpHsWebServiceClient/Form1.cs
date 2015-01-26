@@ -12,7 +12,7 @@ namespace HSControl
 
         private void buttonArm_Click(object sender, EventArgs e)
         {
-            labelResponse.Text = ServiceClient.Arm(checkBoxArmed.Checked);
+            labelResponse.Text = ServiceClient.RunActionList(comboBoxActionLists.Text);
         }
 
         private void buttonGetArmed_Click(object sender, EventArgs e)
