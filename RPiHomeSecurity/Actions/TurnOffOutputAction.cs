@@ -7,7 +7,7 @@ namespace RPiHomeSecurity
 {
     internal class TurnOffOutputAction : Action
     {
-        private String output;
+        public String output;
 
         public TurnOffOutputAction(String output)
         {

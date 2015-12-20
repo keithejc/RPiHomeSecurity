@@ -103,10 +103,13 @@ namespace RPiHomeSecurity
             InputPins = new Dictionary<string, int>();
             InputPins.Add("Door", 3);
             InputPins.Add("Handle", 11);
+            InputPins.Add("Arm", 8);
+            InputPins.Add("DisArm", 10);
+            InputPins.Add("MainsOk", 18);
 
             OutputPins = new Dictionary<string, int>();
-            OutputPins.Add(SirenOutputName, 13);
-            OutputPins.Add(LightOutputName, 16);
+            OutputPins.Add(SirenOutputName, 16);
+            OutputPins.Add(LightOutputName, 13);
 
             EmailAddress = "something@gmail.com";
             SmtpServer = "smtp.gmail.com";
@@ -164,8 +167,6 @@ namespace RPiHomeSecurity
             disarmActions.Add(new ToggleOutputAction(SirenOutputName, ChimeDuration, 200, 3));
             ActionLists.Add(DisarmActionListName, disarmActions);
 
-            // var warningActions = new
-
             var alarmOnActions = new List<Action>();
             alarmOnActions.Add(new SetAlarmStateAction(true));
             alarmOnActions.Add(new TurnOnOutputAction(SirenOutputName, AlarmSirenDuration));
@@ -209,7 +210,10 @@ namespace RPiHomeSecurity
                 ITraceWriter traceWriter = new MemoryTraceWriter();
 
                 var json = System.IO.File.ReadAllText(fileFullName, Encoding.UTF8);
-                config = JsonConvert.DeserializeObject<Config>(json);
+                config = JsonConvert.DeserializeObject<Config>(json, new JsonSerializerSettings
+                {
+                    TypeNameHandling = TypeNameHandling.Auto
+                });
             }
             catch (Exception e)
             {
@@ -241,7 +245,10 @@ namespace RPiHomeSecurity
                 config.CreateDefaults();
 
                 //write to JSON formatted config file
-                String json = JsonConvert.SerializeObject(config, Formatting.Indented);
+                String json = JsonConvert.SerializeObject(config, Formatting.Indented, new JsonSerializerSettings
+                {
+                    TypeNameHandling = TypeNameHandling.Auto
+                });
                 System.IO.File.WriteAllText(fileFullName, json, Encoding.UTF8);
                 ret = true;
             }

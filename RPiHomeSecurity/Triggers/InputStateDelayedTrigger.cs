@@ -10,9 +10,9 @@ namespace RPiHomeSecurity.Triggers
     {
         //new public event TriggeredEventHandler TriggeredEventHandler;
 
-        private int msDelay;
+        public int msDelay;
         private Timer delayTimer;
-        private bool resetDelayIfInputChanges;
+        public bool resetDelayIfInputChanges;
 
         //trigger if the
         public InputStateDelayedTrigger(String name, PinState triggerState, int msDelay, bool resetDelayIfInputChanges)

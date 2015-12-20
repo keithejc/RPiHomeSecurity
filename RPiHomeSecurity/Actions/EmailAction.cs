@@ -11,8 +11,8 @@ namespace RPiHomeSecurity
 {
     internal class EmailAction : Action
     {
-        private string subject;
-        private string body;
+        public string subject;
+        public string body;
 
         public EmailAction(String subject, String body)
         {

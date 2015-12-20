@@ -40,7 +40,7 @@ namespace RPiHomeSecurity
         //call this when the hardware input changes
         protected void InputChanged(bool newValue)
         {
-            log.LogDebugMessage("Input " + Name + " changed to: " + (newValue ? "High" : "Low"));
+            log.LogDebugMessage("InputPin.InputChanged() " + Name + " changed to: " + (newValue ? "High" : "Low"));
             Value = newValue ? PinState.High : PinState.Low;
 
             if (inputChangedEventHandler != null)

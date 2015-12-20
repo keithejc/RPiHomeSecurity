@@ -7,7 +7,7 @@ namespace RPiHomeSecurity
 {
     internal class SetAlarmStateAction : Action
     {
-        private bool setState;
+        public bool setState;
 
         public SetAlarmStateAction(bool setState)
         {

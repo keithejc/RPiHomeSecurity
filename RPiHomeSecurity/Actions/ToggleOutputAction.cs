@@ -7,10 +7,10 @@ namespace RPiHomeSecurity
 {
     internal class ToggleOutputAction : Action
     {
-        private String output;
-        private int msOffTime;
-        private int numToggles;
-        private int msOnTime;
+        public String output;
+        public int msOffTime;
+        public int numToggles;
+        public int msOnTime;
 
         public ToggleOutputAction(String output, int msOnTime, int msOffTime, int numToggles)
         {

@@ -7,7 +7,7 @@ namespace RPiHomeSecurity.Triggers
 {
     public class AlarmStateTrigger : Trigger
     {
-        private bool alarmTriggerState;
+        public bool alarmTriggerState;
 
         public AlarmStateTrigger(bool alarmTriggerState)
         {

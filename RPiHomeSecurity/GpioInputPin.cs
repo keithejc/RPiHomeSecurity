@@ -37,7 +37,12 @@ namespace RPiHomeSecurity
                     InputChanged(b);
                 });
 
-            log.LogDebugMessage("Input " + name + " on " + gpioPin);
+            log.LogDebugMessage("GpioInputPin CTOR() " + name + " on " + gpioPin);
+        }
+
+        ~GpioInputPin()
+        {
+            log.LogDebugMessage("GpioInputPin DTOR() " + pin.Name);
         }
     }
 }

@@ -8,7 +8,7 @@ namespace RPiHomeSecurity
 {
     public class PauseAction : Action
     {
-        private int msDelay;
+        public int msDelay;
 
         public PauseAction(int msDelay)
         {

@@ -7,7 +7,7 @@ namespace RPiHomeSecurity.Triggers
 {
     public class ArmStateTrigger : Trigger
     {
-        private bool armTriggerState;
+        public bool armTriggerState;
 
         public ArmStateTrigger(bool armTriggerState)
         {

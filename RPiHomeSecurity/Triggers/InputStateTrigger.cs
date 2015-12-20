@@ -10,9 +10,9 @@ namespace RPiHomeSecurity.Triggers
     {
         public event TriggeredEventHandler TriggeredEventHandler;
 
-        protected string name;
-        protected PinState triggerState;
-        public InputPin input;
+        public string name;
+        public PinState triggerState;
+        private InputPin input;
 
         public InputStateTrigger(String name, PinState triggerState)
         {
@@ -22,6 +22,7 @@ namespace RPiHomeSecurity.Triggers
 
         protected override void InitialiseTrigger()
         {
+            log.LogDebugMessage("alarmController.GetInputPin(name); " + name);
             input = alarmController.GetInputPin(name);
             input.inputChangedEventHandler += new InputChangedEventHandler(InputChangedEventHandler);
         }

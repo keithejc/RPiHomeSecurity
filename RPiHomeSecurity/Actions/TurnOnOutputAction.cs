@@ -7,8 +7,8 @@ namespace RPiHomeSecurity
 {
     public class TurnOnOutputAction : Action
     {
-        private String output;
-        private int duration;
+        public String output;
+        public int duration;
 
         public TurnOnOutputAction(String output, int msDuration)
         {

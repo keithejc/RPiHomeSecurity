@@ -15,19 +15,31 @@
  ******************************************************************************/
 
 using System;
+using System.IO;
 
 namespace RPiHomeSecurity
 {
     public class log
     {
+
+
         public static void LogError(String err)
         {
             Console.WriteLine(err);
+
+            var fileLoc = AppDomain.CurrentDomain.BaseDirectory;
+            var Logfile = Path.Combine(fileLoc, "log.txt");
+            File.AppendAllText(Logfile, "Error: " + err + Environment.NewLine);
         }
 
         public static void LogDebugMessage(String msg)
         {
+            var fileLoc = AppDomain.CurrentDomain.BaseDirectory;
+            var Logfile = Path.Combine(fileLoc, "log.txt");
+
             Console.WriteLine(msg);
+            File.AppendAllText(Logfile, msg + Environment.NewLine);
         }
+
     }
 }

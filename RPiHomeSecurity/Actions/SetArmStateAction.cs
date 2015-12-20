@@ -5,9 +5,9 @@ using System.Text;
 
 namespace RPiHomeSecurity
 {
-    internal class SetArmStateAction : Action
+    public class SetArmStateAction : Action
     {
-        private bool setState;
+        public bool setState;
 
         public SetArmStateAction(bool setState)
         {
