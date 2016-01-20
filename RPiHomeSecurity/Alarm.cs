@@ -22,7 +22,7 @@ using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel.Web;
 using System.Timers;
-using RpHsWebServiceLib;
+using RPiHomeSecurity.wamp;
 
 namespace RPiHomeSecurity
 {
@@ -36,8 +36,8 @@ namespace RPiHomeSecurity
 
         public Config Config { get; set; }
 
-        private WebServiceHost _serviceHost;
-        private RpHsWebService rpHsWebService;
+        private System.Timers.Timer loggerStatusTimer;
+        private const double statusTimerInterval = 1000;
 
         //setup the alarm system
         public Alarm(Config configuration)
@@ -57,34 +57,17 @@ namespace RPiHomeSecurity
             RunActionList(Config.StartupActionListName);
             log.LogDebugMessage("Rpi Home Security Ready...");
 
-            //start web service
-            var ipAddress = Utils.GetIpAddress();
-            if (ipAddress != IPAddress.None)
-            {
-                rpHsWebService = new RpHsWebService();
-                rpHsWebService.getStatusEventHandler += new RpHsWebService.GetStatusEventHandler(GetStatus);
-                rpHsWebService.runActionListEventHandler += new RpHsWebService.RunActionListEventHandler(RunActionList);
-                log.LogDebugMessage("Web Service binding to: " + ipAddress.ToString() + ":" + Config.WebInterfacePort);
+            loggerStatusTimer = new System.Timers.Timer(statusTimerInterval);
+            loggerStatusTimer.AutoReset = true;
+            loggerStatusTimer.Elapsed += OnSystemStatusTimerEvent;
 
-                _serviceHost = new WebServiceHost(rpHsWebService, new Uri("http://" + ipAddress.ToString() + ":" + Config.WebInterfacePort + "/RpHsWebService"));
-                _serviceHost.Open();
-            }
-            else
-            {
-                log.LogError("Failed to get ip address of this device, no web interface available");
-            }
         }
 
         ~Alarm()
         {
-            _serviceHost.Close();
         }
 
         //callback for the web service
-        private AlarmStatus GetStatus()
-        {
-            return new AlarmStatus() { Armed = this.Armed, InAlarm = this.Alarmed };
-        }
 
         public InputPin GetInputPin(string name)
         {
@@ -125,5 +108,25 @@ namespace RPiHomeSecurity
                 }
             }
         }
+
+        public delegate void PublishRpiSystemStatus(RPiHomeSecurityStatus status);
+        public event PublishRpiSystemStatus PublishStatusEventHandler;
+
+        //publish status information at least every loggerStatusTimerInterval
+        private void OnSystemStatusTimerEvent(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            PublishStatus();
+        }
+
+        private void PublishStatus()
+        {
+            if (PublishStatusEventHandler != null)
+            {
+                RPiHomeSecurityStatus status;
+                status.InAlarm = Alarmed;
+            }
+        }
+
+
     }
 }

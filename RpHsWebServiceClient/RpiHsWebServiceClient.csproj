@@ -107,12 +107,6 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\RpHsWebServiceLib\RpHsWebServiceLib.csproj">
-      <Project>{A63E0E3C-C563-4F65-BA54-422FD1849B63}</Project>
-      <Name>RpHsWebServiceLib</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0">
       <Visible>False</Visible>
       <ProductName>Microsoft .NET Framework 4 %28x86 and x64%29</ProductName>

@@ -192,7 +192,7 @@ namespace RPiHomeSecurity
             ActionLists.Add(HandleWhileArmedActionListName, handleWhileArmedActions);
 
             var handleWhileDisarmedActions = new List<Action>();
-            handleWhileDisarmedActions.Add(new TurnOnOutputAction(LightOutputName, 3000));
+            handleWhileDisarmedActions.Add(new TurnOnOutputAction(LightOutputName, 10000));
             handleWhileDisarmedActions.Add(new ToggleOutputAction(SirenOutputName, ChimeDuration, 200, 2));
             ActionLists.Add(HandleWhileDisarmedActionListName, handleWhileDisarmedActions);
         }

@@ -17,6 +17,10 @@
 using System;
 
 using System.Threading;
+using Mono.Unix;
+using Mono.Unix.Native;
+using RPiHomeSecurity.wamp;
+using WampSharp.Logging;
 
 namespace RPiHomeSecurity
 {
@@ -39,16 +43,43 @@ namespace RPiHomeSecurity
 
                     if (!Config.IsConfigFilePresent())
                     {
-                        log.LogDebugMessage("No config file, creating default. Populate config.cfg with relevant settings");
+                        log.LogDebugMessage(
+                            "No config file, creating default. Populate config.cfg with relevant settings");
                         Config.WriteConfigFile(new Config());
                     }
                     else
                     {
                         var config = Config.ReadConfigFile();
                         var alarm = new Alarm(config);
-                        while (true)
+
+                        //create wamp client
+                        string wampweb = "ws://127.0.0.1:8080/ws";
+                        string realm = "rpihomesecurity";
+                        WampBackend.Instance.Init(wampweb, realm);
+
+                        //link up web service
+                        WampBackend.Instance.RunActionListHandler += alarm.RunActionList;
+
+                        alarm.PublishStatusEventHandler += WampBackend.Instance.PublishRpiSystemStatus;
+
+                        //try to connect to wamp router every 20 seconds if not already connected
+                        UnixSignal TERMSignal = new UnixSignal(Signum.SIGINT);
+                        DateTime start = DateTime.Now;
+                        while (!TERMSignal.IsSet)
                         {
+                            if (!WampBackend.Instance.IsConnected)
+                            {
+                                var interval = DateTime.Now - start;
+                                if (interval.TotalSeconds > 20)
+                                {
+                                    start = DateTime.Now;
+                                    WampBackend.Instance.Init(wampweb, realm);
+                                }
+                            }
                         }
+
+                        WampBackend.Instance.Close();
+
                     }
                 }
                 finally
