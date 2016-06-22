@@ -22,7 +22,7 @@ namespace RPiHomeSecurity
 {
     public class GpioController : IoController
     {
-        private GpioConnection connection;
+        private GpioConnection _connection;
 
         //setup the Raspberry.IO.GeneralPurpose driver with opur list of inputs and outputs
         public GpioController(Dictionary<String, InputPin> inputs, Dictionary<String, OutputPin> outputs)
@@ -36,17 +36,17 @@ namespace RPiHomeSecurity
             }
 
             //connection needs to know the list of inputs we setup
-            connection = new GpioConnection();
+            _connection = new GpioConnection();
             foreach (var input in Inputs)
             {
-                input.Value.inputChangedEventHandler += new InputChangedEventHandler(InputChanged);
-                connection.Add(((GpioInputPin)input.Value).PinConfig);
+                input.Value.InputChangedEventHandler += new InputChangedEventHandler(InputChanged);
+                _connection.Add(((GpioInputPin)input.Value).PinConfig);
             }
         }
 
         ~GpioController()
         {
-            connection.Close();
+            _connection.Close();
         }
 
         //gpio pin header number to enum

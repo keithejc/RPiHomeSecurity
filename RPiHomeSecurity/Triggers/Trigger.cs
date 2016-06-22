@@ -9,11 +9,11 @@ namespace RPiHomeSecurity
 
     public abstract class Trigger
     {
-        protected Alarm alarmController;
+        protected Alarm AlarmController;
 
         public void Initialise(Alarm alarmController)
         {
-            this.alarmController = alarmController;
+            this.AlarmController = alarmController;
 
             InitialiseTrigger();
         }

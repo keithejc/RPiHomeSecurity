@@ -5,39 +5,56 @@ using System.Net;
 using System.Net.Mail;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
+using System.Security.Policy;
 using System.Text;
+using RPiHomeSecurity.Utils;
 
 namespace RPiHomeSecurity
 {
     internal class EmailAction : Action
     {
-        public string subject;
-        public string body;
+        public string Subject;
+        public string Body;
 
         public EmailAction(String subject, String body)
         {
-            this.subject = subject;
-            this.body = body;
+            this.Subject = subject;
+            this.Body = body;
         }
 
-        public override void RunAction(Alarm AlarmController)
+        public override void RunAction(Alarm alarmController)
         {
-            log.LogDebugMessage("running Email action. Subject: " + subject);
-            SendEmail(subject, body, AlarmController.Config);
+            Log.LogMessage("running Email action. Subject: " + Subject);
+            SendEmail(Subject, Body, alarmController.Config);
         }
+
+        public String ReplaceTokens(String text)
+        {
+            var ret = text;
+
+            if (text.Contains(@"%PUBLICIP%"))
+            {
+                var pIp = WebUtils.GetPublicIp();
+                ret = text.Replace(@"%PUBLICIP%", pIp);
+            }
+
+            return ret;
+        }
+
 
         //send an email
         public void SendEmail(String subject, String body, Config config)
         {
             try
             {
-                log.LogDebugMessage("Send email: '" + subject + "' to " + config.EmailAddress);
+                Log.LogMessage("Send email: '" + subject + "' to " + config.EmailAddress);
 
-                String toAddress = config.EmailAddress;
-                MailAddress from = new MailAddress(config.SmtpFromAddress);
-                MailAddress to = new MailAddress(toAddress);
+                var toAddress = config.EmailAddress;
+                var from = new MailAddress(config.SmtpFromAddress);
+                var to = new MailAddress(toAddress);
 
-                string fromPassword = config.SmtpPassword;
+                var fromPassword = config.SmtpPassword;
+                Log.LogMessage("Send email: password: " + fromPassword);
                 var smtpClient = new SmtpClient
                 {
                     Host = config.SmtpServer,
@@ -49,19 +66,23 @@ namespace RPiHomeSecurity
                 };
                 ServicePointManager.ServerCertificateValidationCallback =
                     delegate(object s, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
-                    { return true; };
+                    {
+                        Log.LogMessage("validation callback");
+                        return true;
+                    };
 
-                MailMessage msg = new MailMessage(from, to)
+                var msg = new MailMessage(from, to)
                 {
-                    Subject = subject,
-                    Body = DateTime.Now.ToLongDateString() + Environment.NewLine +
+                    Subject = ReplaceTokens(subject),
+                    Body = ReplaceTokens(DateTime.Now.ToLongDateString() + Environment.NewLine +
                     DateTime.Now.ToLongTimeString() + Environment.NewLine +
-                    config.EmailBody + Environment.NewLine +
-                    body
+                    config.EmailBody + Environment.NewLine + body)
                 };
 
                 smtpClient.SendCompleted += (s, e) =>
                 {
+                    Log.LogMessage("Send email: send complete");
+
                     smtpClient.Dispose();
                     msg.Dispose();
                 };
@@ -70,7 +91,7 @@ namespace RPiHomeSecurity
             }
             catch (Exception e)
             {
-                log.LogError("Error sending email: " + e.ToString());
+                Log.LogError("Error sending email: " + e.ToString());
             }
         }
     }

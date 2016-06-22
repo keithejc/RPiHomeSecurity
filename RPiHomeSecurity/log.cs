@@ -19,26 +19,32 @@ using System.IO;
 
 namespace RPiHomeSecurity
 {
-    public class log
-    {
 
+    public class Log
+    {
+        private  static readonly Object LogFileLock = new Object();
 
         public static void LogError(String err)
         {
-            Console.WriteLine(err);
-
-            var fileLoc = AppDomain.CurrentDomain.BaseDirectory;
-            var Logfile = Path.Combine(fileLoc, "log.txt");
-            File.AppendAllText(Logfile, "Error: " + err + Environment.NewLine);
+            LogMessage("Error: " + err);
         }
 
-        public static void LogDebugMessage(String msg)
+        public static void LogMessage(String msg)
         {
-            var fileLoc = AppDomain.CurrentDomain.BaseDirectory;
-            var Logfile = Path.Combine(fileLoc, "log.txt");
+            try
+            {
+                lock (LogFileLock)
+                {
+                    var fileLoc = AppDomain.CurrentDomain.BaseDirectory;
+                    var logfile = Path.Combine(fileLoc, "log.txt");
 
-            Console.WriteLine(msg);
-            File.AppendAllText(Logfile, msg + Environment.NewLine);
+                    Console.WriteLine(msg);
+                    File.AppendAllText(logfile, DateTime.Now + "," + msg + Environment.NewLine);
+                }
+            }
+            catch (Exception)
+            {
+            }
         }
 
     }

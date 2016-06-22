@@ -21,33 +21,33 @@ namespace RPiHomeSecurity
 {
     internal class GpioOutputPin : OutputPin
     {
-        private IGpioConnectionDriver driver;
+        private IGpioConnectionDriver _driver;
 
         public IGpioConnectionDriver Driver
         {
             set
             {
-                driver = value;
-                driver.Allocate(processorPin, PinDirection.Output);
+                _driver = value;
+                _driver.Allocate(_processorPin, PinDirection.Output);
             }
         }
 
-        private ConnectorPin connectorPin;
-        private ProcessorPin processorPin;
+        private ConnectorPin _connectorPin;
+        private ProcessorPin _processorPin;
 
         public GpioOutputPin(int pinNumber, String name)
             : base(pinNumber, name)
         {
-            connectorPin = GpioController.IntToConnectorPin(pinNumber);
-            processorPin = connectorPin.ToProcessor();
+            _connectorPin = GpioController.IntToConnectorPin(pinNumber);
+            _processorPin = _connectorPin.ToProcessor();
 
-            log.LogDebugMessage("Output " + name + " on " + connectorPin);
+            Log.LogMessage("Output " + name + " on " + _connectorPin);
         }
 
         ~GpioOutputPin()
         {
             TurnOff();
-            driver.Release(processorPin);
+            _driver.Release(_processorPin);
         }
 
         //turn on the output using Raspberry.IO.GeneralPurpose library
@@ -58,12 +58,13 @@ namespace RPiHomeSecurity
             {
                 try
                 {
-                    log.LogDebugMessage("Turn on " + connectorPin.ToString());
-                    driver.Write(processorPin, true);
+                    Log.LogMessage("Turn on " + _connectorPin.ToString());
+                    _driver.Write(_processorPin, true);
+                    _pinState = PinState.High;
                 }
                 catch (Exception e)
                 {
-                    log.LogError("Failed to turn On " + connectorPin.ToString() + " Error: " + e.ToString());
+                    Log.LogError("Failed to turn On " + _connectorPin.ToString() + " Error: " + e.ToString());
                 }
             }
         }
@@ -76,12 +77,13 @@ namespace RPiHomeSecurity
             {
                 try
                 {
-                    log.LogDebugMessage("Output off. " + connectorPin);
-                    driver.Write(processorPin, false);
+                    Log.LogMessage("Output off. " + _connectorPin);
+                    _driver.Write(_processorPin, false);
+                    _pinState = PinState.Low;
                 }
                 catch (Exception e)
                 {
-                    log.LogError("Failed to turn Off " + connectorPin.ToString() + " Error: " + e.ToString());
+                    Log.LogError("Failed to turn Off " + _connectorPin.ToString() + " Error: " + e.ToString());
                 }
             }
         }

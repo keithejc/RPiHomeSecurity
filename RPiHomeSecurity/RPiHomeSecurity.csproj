@@ -72,12 +72,24 @@
       <HintPath>..\packages\Castle.Core.3.3.1\lib\net40-client\Castle.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Fleck, Version=0.13.0.57, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Fleck.0.13.0.57\lib\net40\Fleck.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Mono.Posix, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
       <HintPath>..\packages\Mono.Posix.4.0.0.0\lib\net40\Mono.Posix.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net40\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="MsgPack, Version=0.6.0.0, Culture=neutral, PublicKeyToken=a2625990d5dc0167, processorArchitecture=MSIL">
+      <HintPath>..\packages\MsgPack.Cli.0.6.2\lib\net40-client\MsgPack.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.5\lib\net40\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Msgpack, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Msgpack.0.1.8\lib\net40\Newtonsoft.Msgpack.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Rackspace.Collections.Immutable, Version=1.1.0.0, Culture=neutral, PublicKeyToken=8acff7051142f28d, processorArchitecture=MSIL">
@@ -130,8 +142,33 @@
       <HintPath>..\packages\WampSharp.1.2.3.14-beta\lib\net40\WampSharp.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="WampSharp.Default.Client">
+    <Reference Include="WampSharp.Default.Client, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\WampSharp.Default.Client.1.2.3.14-beta\lib\net40\WampSharp.Default.Client.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="WampSharp.Default.Router, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WampSharp.Default.Router.1.2.3.14-beta\lib\net40\WampSharp.Default.Router.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="WampSharp.Fleck, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WampSharp.Fleck.1.2.3.14-beta\lib\net40\WampSharp.Fleck.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="WampSharp.NewtonsoftJson, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WampSharp.NewtonsoftJson.1.2.3.14-beta\lib\net40\WampSharp.NewtonsoftJson.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="WampSharp.NewtonsoftMsgpack, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WampSharp.NewtonsoftMsgpack.1.2.3.14-beta\lib\net40\WampSharp.NewtonsoftMsgpack.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="WampSharp.WebSocket4Net, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WampSharp.WebSocket4Net.1.2.3.14-beta\lib\net40\WampSharp.WebSocket4Net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="WebSocket4Net, Version=0.14.0.0, Culture=neutral, PublicKeyToken=eb4e154b696bf72a, processorArchitecture=MSIL">
+      <HintPath>..\packages\WebSocket4Net.0.14\lib\net40\WebSocket4Net.dll</HintPath>
+      <Private>True</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -174,6 +211,7 @@
     <Compile Include="Triggers\InputStateTrigger.cs" />
     <Compile Include="Triggers\Trigger.cs" />
     <Compile Include="Triggers\TriggerList.cs" />
+    <Compile Include="Utils\WebUtils.cs" />
     <Compile Include="wamp\WampBackend.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -208,8 +246,26 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="web\" />
+    <Content Include="web\angular.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="web\app.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="web\app.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="web\autobahn.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="web\autobahn.min.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="web\index.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

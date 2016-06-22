@@ -5,30 +5,30 @@ namespace RPiHomeSecurity.Triggers
 {
     public class TriggerList
     {
-        public List<Trigger> triggers;
+        public List<Trigger> Triggers;
 
         public string ActionList { get; set; }
 
         public InputStateTrigger MainTrigger { get; set; }
 
-        private Alarm alarmController;
+        private Alarm _alarmController;
 
         public TriggerList(InputStateTrigger mainTrigger, List<Trigger> triggers, String actionList)
         {
             MainTrigger = mainTrigger;
-            this.triggers = triggers;
+            this.Triggers = triggers;
             ActionList = actionList;
         }
 
         //initialise each trigger and fix up event handlers
         public void Initialise(Alarm alarmController)
         {
-            this.alarmController = alarmController;
+            this._alarmController = alarmController;
             //fix up the main trigger's event handler
             MainTrigger.Initialise(alarmController);
             MainTrigger.TriggeredEventHandler += new TriggeredEventHandler(MainTrigger_TriggeredEventHandler);
 
-            foreach (var trigger in triggers)
+            foreach (var trigger in Triggers)
             {
                 trigger.Initialise(alarmController);
             }
@@ -39,15 +39,15 @@ namespace RPiHomeSecurity.Triggers
         {
             if (IsTriggered())
             {
-                alarmController.RunActionList(ActionList);
+                _alarmController.RunActionList(ActionList);
             }
         }
 
         //and together all the other triggers
         public bool IsTriggered()
         {
-            bool triggered = true;
-            foreach (var trigger in triggers)
+            var triggered = true;
+            foreach (var trigger in Triggers)
             {
                 if (!trigger.IsTriggered())
                 {

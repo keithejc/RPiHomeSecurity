@@ -7,18 +7,18 @@ namespace RPiHomeSecurity
 {
     internal class SetAlarmStateAction : Action
     {
-        public bool setState;
+        public bool SetState;
 
         public SetAlarmStateAction(bool setState)
         {
-            this.setState = setState;
+            this.SetState = setState;
         }
 
-        public override void RunAction(Alarm AlarmController)
+        public override void RunAction(Alarm alarmController)
         {
-            log.LogDebugMessage("running Set Alarm State action. " + setState);
+            Log.LogMessage("running Set Alarm State action. " + SetState);
 
-            AlarmController.Alarmed = setState;
+            alarmController.Alarmed = SetState;
         }
     }
 }

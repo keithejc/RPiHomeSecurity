@@ -21,28 +21,28 @@ namespace RPiHomeSecurity
 {
     internal class GpioInputPin : InputPin
     {
-        private PinConfiguration pin;
+        private PinConfiguration _pin;
 
-        public PinConfiguration PinConfig { get { return pin; } }
+        public PinConfiguration PinConfig { get { return _pin; } }
 
         //setup the event handler for changes - using Raspberry.IO.GeneralPurpose library
         public GpioInputPin(int pinNumber, String name)
             : base(pinNumber, name)
         {
-            ConnectorPin gpioPin = GpioController.IntToConnectorPin(pinNumber);
-            pin = gpioPin.Input()
+            var gpioPin = GpioController.IntToConnectorPin(pinNumber);
+            _pin = gpioPin.Input()
                 .Name(gpioPin.ToString())
                 .OnStatusChanged(b =>
                 {
                     InputChanged(b);
                 });
 
-            log.LogDebugMessage("GpioInputPin CTOR() " + name + " on " + gpioPin);
+            Log.LogMessage("GpioInputPin CTOR() " + name + " on " + gpioPin);
         }
 
         ~GpioInputPin()
         {
-            log.LogDebugMessage("GpioInputPin DTOR() " + pin.Name);
+            Log.LogMessage("GpioInputPin DTOR() " + _pin.Name);
         }
     }
 }

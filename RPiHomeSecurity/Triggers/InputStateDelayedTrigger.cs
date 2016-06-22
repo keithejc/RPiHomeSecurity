@@ -10,23 +10,23 @@ namespace RPiHomeSecurity.Triggers
     {
         //new public event TriggeredEventHandler TriggeredEventHandler;
 
-        public int msDelay;
-        private Timer delayTimer;
-        public bool resetDelayIfInputChanges;
+        public int MsDelay;
+        private Timer _delayTimer;
+        public bool ResetDelayIfInputChanges;
 
         //trigger if the
         public InputStateDelayedTrigger(String name, PinState triggerState, int msDelay, bool resetDelayIfInputChanges)
             : base(name, triggerState)
         {
-            this.msDelay = msDelay;
-            this.resetDelayIfInputChanges = resetDelayIfInputChanges;
+            this.MsDelay = msDelay;
+            this.ResetDelayIfInputChanges = resetDelayIfInputChanges;
 
-            delayTimer = new Timer();
+            _delayTimer = new Timer();
             if (msDelay > 0)
             {
-                delayTimer.Interval = msDelay;
+                _delayTimer.Interval = msDelay;
             }
-            delayTimer.Elapsed += new ElapsedEventHandler(delayTimer_Elapsed);
+            _delayTimer.Elapsed += new ElapsedEventHandler(delayTimer_Elapsed);
         }
 
         private void delayTimer_Elapsed(object sender, ElapsedEventArgs e)
@@ -41,18 +41,18 @@ namespace RPiHomeSecurity.Triggers
         //if there is a delay setup then the trigger won't happen till the time is up
         protected override void InputChangedEventHandler(InputPin pin)
         {
-            log.LogDebugMessage("InputChangedEventHandler " + pin.Name + " Value: " + pin.Value);
+            Log.LogMessage("InputChangedEventHandler " + pin.Name + " Value: " + pin.Value);
             //log.LogDebugMessage("TriggeredEventHandler " + (TriggeredEventHandler != null).ToString());
             if (IsTriggered())
             {
-                log.LogDebugMessage(pin.Name + " triggered on " + triggerState);
+                Log.LogMessage(pin.Name + " triggered on " + TriggerState);
 
                 //don't try and start the timer if it's already running
-                if (msDelay > 0 && !delayTimer.Enabled)
+                if (MsDelay > 0 && !_delayTimer.Enabled)
                 {
-                    log.LogDebugMessage("Starting delay trigger on " + pin.Name + " for " + msDelay + "ms");
+                    Log.LogMessage("Starting delay trigger on " + pin.Name + " for " + MsDelay + "ms");
 
-                    delayTimer.Start();
+                    _delayTimer.Start();
                 }
                 else
                 {
@@ -60,9 +60,9 @@ namespace RPiHomeSecurity.Triggers
                 }
             }
             //if we have gone into a non-trigger state, stop any delay timer if wanted
-            else if (resetDelayIfInputChanges)
+            else if (ResetDelayIfInputChanges)
             {
-                delayTimer.Stop();
+                _delayTimer.Stop();
             }
         }
     }

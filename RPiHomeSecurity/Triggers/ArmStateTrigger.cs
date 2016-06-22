@@ -7,11 +7,11 @@ namespace RPiHomeSecurity.Triggers
 {
     public class ArmStateTrigger : Trigger
     {
-        public bool armTriggerState;
+        public bool ArmTriggerState;
 
         public ArmStateTrigger(bool armTriggerState)
         {
-            this.armTriggerState = armTriggerState;
+            this.ArmTriggerState = armTriggerState;
         }
 
         protected override void InitialiseTrigger()
@@ -20,7 +20,7 @@ namespace RPiHomeSecurity.Triggers
 
         public override bool IsTriggered()
         {
-            return alarmController.Armed == armTriggerState;
+            return AlarmController.Armed == ArmTriggerState;
         }
     }
 }

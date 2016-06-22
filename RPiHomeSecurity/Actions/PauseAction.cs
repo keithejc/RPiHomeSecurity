@@ -8,18 +8,18 @@ namespace RPiHomeSecurity
 {
     public class PauseAction : Action
     {
-        public int msDelay;
+        public int MsDelay;
 
         public PauseAction(int msDelay)
         {
-            this.msDelay = msDelay;
+            this.MsDelay = msDelay;
         }
 
-        public override void RunAction(Alarm AlarmController)
+        public override void RunAction(Alarm alarmController)
         {
-            log.LogDebugMessage("running pause action. Delay: " + msDelay);
+            Log.LogMessage("running pause action. Delay: " + MsDelay);
 
-            Thread.Sleep(msDelay);
+            Thread.Sleep(MsDelay);
         }
     }
 }

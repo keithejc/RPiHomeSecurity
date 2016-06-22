@@ -11,10 +11,6 @@ using WampSharp.V2.Rpc;
 
 namespace RPiHomeSecurity.wamp
 {
-    public struct RPiHomeSecurityStatus
-    {
-        public bool InAlarm;
-    }
 
     public class WampBackend
     {
@@ -35,28 +31,28 @@ namespace RPiHomeSecurity.wamp
             IsConnected = false;
         }
 
-        private DefaultWampChannelFactory factory;
-        private IWampChannel channel;
+        private DefaultWampChannelFactory _factory;
+        private IWampChannel _channel;
         private IWampClientConnectionMonitor monitor;
         private IWampRealmServiceProvider services;
 
 
         public void Close()
         {
-            channel.Close();
+            _channel.Close();
         }
 
         public void Init(string wsuri, string realm)
         {
-            factory = new DefaultWampChannelFactory();
+            _factory = new DefaultWampChannelFactory();
 
-            channel = factory.CreateJsonChannel(wsuri, realm);
+            _channel = _factory.CreateJsonChannel(wsuri, realm);
 
             try
             {
-                channel.Open().Wait();
+                _channel.Open().Wait();
 
-                services = channel.RealmProxy.Services;
+                services = _channel.RealmProxy.Services;
 
                 // register procedures for remote calling
                 services.RegisterCallee(this).Wait();
@@ -64,7 +60,7 @@ namespace RPiHomeSecurity.wamp
                 // publishing
                 onPublishSystemStatusSubject = services.GetSubject<RPiHomeSecurityStatus>("com.rpihomesecurity.onstatus");
 
-                monitor = channel.RealmProxy.Monitor;
+                monitor = _channel.RealmProxy.Monitor;
                 monitor.ConnectionBroken += OnClose;
                 monitor.ConnectionError += OnError;
 
@@ -99,7 +95,6 @@ namespace RPiHomeSecurity.wamp
 
 
         public delegate void RunActionListEvent(String actionList);
-
         public event RunActionListEvent RunActionListHandler;
 
         [WampProcedure("com.rpihomesecurity.runactionlist")]
@@ -107,8 +102,23 @@ namespace RPiHomeSecurity.wamp
         {
             if (RunActionListHandler != null)
             {
+                Console.WriteLine("RunActionList " + actionList);
                 RunActionListHandler.Invoke(actionList);
             }
+        }
+
+        public delegate List<String> GetActionListsEvent();
+        public event GetActionListsEvent GetActionListsHandler;
+
+        [WampProcedure("com.rpihomesecurity.getactionlists")]
+        public List<String> GetActionLists()
+        {
+            if (GetActionListsHandler != null)
+            {
+                return GetActionListsHandler.Invoke();
+            }
+
+            return null;
         }
 
 

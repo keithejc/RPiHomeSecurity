@@ -7,17 +7,17 @@ namespace RPiHomeSecurity
 {
     public class SetArmStateAction : Action
     {
-        public bool setState;
+        public bool SetState;
 
         public SetArmStateAction(bool setState)
         {
-            this.setState = setState;
+            this.SetState = setState;
         }
 
-        public override void RunAction(Alarm AlarmController)
+        public override void RunAction(Alarm alarmController)
         {
-            log.LogDebugMessage("running Set Arm State action. " + setState);
-            AlarmController.Armed = setState;
+            Log.LogMessage("running Set Arm State action. " + SetState);
+            alarmController.Armed = SetState;
         }
     }
 }

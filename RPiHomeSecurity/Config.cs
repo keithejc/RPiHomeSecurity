@@ -49,7 +49,7 @@ namespace RPiHomeSecurity
             PifaceDigital
         }
 
-        private static String ConfigFileName = "config.cfg";
+        private static String _configFileName = "config.cfg";
 
         public IoControllerTypes IoControllerType { get; set; }
 
@@ -201,7 +201,7 @@ namespace RPiHomeSecurity
         public static Config ReadConfigFile()
         {
             var fileLoc = AppDomain.CurrentDomain.BaseDirectory;
-            var fileFullName = Path.Combine(fileLoc, ConfigFileName);
+            var fileFullName = Path.Combine(fileLoc, _configFileName);
 
             Config config = null;
 
@@ -217,7 +217,7 @@ namespace RPiHomeSecurity
             }
             catch (Exception e)
             {
-                log.LogError("Failed to read config file. Should be in JSON format. And exist at: " + fileFullName + " " + e.ToString());
+                Log.LogError("Failed to read config file. Should be in JSON format. And exist at: " + fileFullName + " " + e.ToString());
             }
 
             return config;
@@ -227,17 +227,17 @@ namespace RPiHomeSecurity
         public static bool IsConfigFilePresent()
         {
             var fileLoc = AppDomain.CurrentDomain.BaseDirectory;
-            var fileFullName = Path.Combine(fileLoc, ConfigFileName);
+            var fileFullName = Path.Combine(fileLoc, _configFileName);
             return File.Exists(fileFullName);
         }
 
         //create a config file in JSON format with default values
         public static bool WriteConfigFile(Config config)
         {
-            bool ret = false;
+            var ret = false;
 
             var fileLoc = AppDomain.CurrentDomain.BaseDirectory;
-            var fileFullName = Path.Combine(fileLoc, ConfigFileName);
+            var fileFullName = Path.Combine(fileLoc, _configFileName);
 
             try
             {
@@ -245,7 +245,7 @@ namespace RPiHomeSecurity
                 config.CreateDefaults();
 
                 //write to JSON formatted config file
-                String json = JsonConvert.SerializeObject(config, Formatting.Indented, new JsonSerializerSettings
+                var json = JsonConvert.SerializeObject(config, Formatting.Indented, new JsonSerializerSettings
                 {
                     TypeNameHandling = TypeNameHandling.Auto
                 });
@@ -254,7 +254,7 @@ namespace RPiHomeSecurity
             }
             catch (Exception e)
             {
-                log.LogError("Failed to write config file " + fileFullName + " " + e.ToString());
+                Log.LogError("Failed to write config file " + fileFullName + " " + e.ToString());
             }
 
             return ret;

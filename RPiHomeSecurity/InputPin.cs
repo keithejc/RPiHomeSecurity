@@ -23,7 +23,7 @@ namespace RPiHomeSecurity
     public abstract class InputPin
     {
         //event handler to call if the input changes
-        public event InputChangedEventHandler inputChangedEventHandler;
+        public event InputChangedEventHandler InputChangedEventHandler;
 
         public String Name { get; set; }
 
@@ -40,12 +40,12 @@ namespace RPiHomeSecurity
         //call this when the hardware input changes
         protected void InputChanged(bool newValue)
         {
-            log.LogDebugMessage("InputPin.InputChanged() " + Name + " changed to: " + (newValue ? "High" : "Low"));
+            Log.LogMessage("InputPin.InputChanged() " + Name + " changed to: " + (newValue ? "High" : "Low"));
             Value = newValue ? PinState.High : PinState.Low;
 
-            if (inputChangedEventHandler != null)
+            if (InputChangedEventHandler != null)
             {
-                inputChangedEventHandler.Invoke(this);
+                InputChangedEventHandler.Invoke(this);
             }
         }
     }

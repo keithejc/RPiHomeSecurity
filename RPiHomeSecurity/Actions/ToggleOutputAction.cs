@@ -7,27 +7,27 @@ namespace RPiHomeSecurity
 {
     internal class ToggleOutputAction : Action
     {
-        public String output;
-        public int msOffTime;
-        public int numToggles;
-        public int msOnTime;
+        public String Output;
+        public int MsOffTime;
+        public int NumToggles;
+        public int MsOnTime;
 
         public ToggleOutputAction(String output, int msOnTime, int msOffTime, int numToggles)
         {
-            this.output = output;
-            this.msOnTime = msOnTime;
-            this.msOffTime = msOffTime;
-            this.numToggles = numToggles;
+            this.Output = output;
+            this.MsOnTime = msOnTime;
+            this.MsOffTime = msOffTime;
+            this.NumToggles = numToggles;
         }
 
-        public override void RunAction(Alarm AlarmController)
+        public override void RunAction(Alarm alarmController)
         {
-            var pin = AlarmController.GetOutputPin(output);
+            var pin = alarmController.GetOutputPin(Output);
             if (pin != null)
             {
-                log.LogDebugMessage("running Toggle Output Action. On " + pin.Name + ". msOnTime" + msOnTime + " msOffTime:" + msOffTime + " numToggles:" + numToggles);
+                Log.LogMessage("running Toggle Output Action. On " + pin.Name + ". msOnTime" + MsOnTime + " msOffTime:" + MsOffTime + " numToggles:" + NumToggles);
 
-                pin.Toggle(msOnTime, msOffTime, numToggles);
+                pin.Toggle(MsOnTime, MsOffTime, NumToggles);
             }
         }
     }

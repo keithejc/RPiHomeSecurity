@@ -10,21 +10,21 @@ namespace RPiHomeSecurity.Triggers
     {
         public event TriggeredEventHandler TriggeredEventHandler;
 
-        public string name;
-        public PinState triggerState;
-        private InputPin input;
+        public string Name;
+        public PinState TriggerState;
+        private InputPin _input;
 
         public InputStateTrigger(String name, PinState triggerState)
         {
-            this.name = name;
-            this.triggerState = triggerState;
+            this.Name = name;
+            this.TriggerState = triggerState;
         }
 
         protected override void InitialiseTrigger()
         {
-            log.LogDebugMessage("alarmController.GetInputPin(name); " + name);
-            input = alarmController.GetInputPin(name);
-            input.inputChangedEventHandler += new InputChangedEventHandler(InputChangedEventHandler);
+            Log.LogMessage("alarmController.GetInputPin(name); " + Name);
+            _input = AlarmController.GetInputPin(Name);
+            _input.InputChangedEventHandler += new InputChangedEventHandler(InputChangedEventHandler);
         }
 
         //the input has changed - if this mean's we have triggerd then pass this through the event handler
@@ -32,7 +32,7 @@ namespace RPiHomeSecurity.Triggers
         {
             if (TriggeredEventHandler != null && IsTriggered())
             {
-                log.LogDebugMessage(pin.Name + " triggered on " + triggerState);
+                Log.LogMessage(pin.Name + " triggered on " + TriggerState);
 
                 TriggeredEventHandler.Invoke();
             }
@@ -45,7 +45,7 @@ namespace RPiHomeSecurity.Triggers
 
         public override bool IsTriggered()
         {
-            return (input.Value == triggerState);
+            return (_input.Value == TriggerState);
         }
     }
 }

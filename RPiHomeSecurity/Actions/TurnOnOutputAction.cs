@@ -7,22 +7,22 @@ namespace RPiHomeSecurity
 {
     public class TurnOnOutputAction : Action
     {
-        public String output;
-        public int duration;
+        public String Output;
+        public int Duration;
 
         public TurnOnOutputAction(String output, int msDuration)
         {
-            this.output = output;
-            this.duration = msDuration;
+            this.Output = output;
+            this.Duration = msDuration;
         }
 
-        public override void RunAction(Alarm AlarmController)
+        public override void RunAction(Alarm alarmController)
         {
-            var pin = AlarmController.GetOutputPin(output);
+            var pin = alarmController.GetOutputPin(Output);
             if (pin != null)
             {
-                log.LogDebugMessage("running Output On Action. On " + pin.Name);
-                pin.TurnOn(duration);
+                Log.LogMessage("running Output On Action. On " + pin.Name);
+                pin.TurnOn(Duration);
             }
         }
     }

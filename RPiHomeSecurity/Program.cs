@@ -20,30 +20,33 @@ using System.Threading;
 using Mono.Unix;
 using Mono.Unix.Native;
 using RPiHomeSecurity.wamp;
-using WampSharp.Logging;
 
 namespace RPiHomeSecurity
 {
     internal class Program
     {
-        private static Mutex mutex = new Mutex(true, "{1189A51E-3281-43FA-9048-FD7EE0F8F94D}");
+        private static readonly Mutex Mutex = new Mutex(true, "{1189A51E-3281-43FA-9048-FD7EE0F8F94D}");
 
-        private static void Main(string[] args)
+        private const String Wampweb = "ws://127.0.0.1:8080/ws";
+        private const String Realm = "rpihomesecurity";
+
+
+        private static void Main(String[] args)
         {
             //only allow one instance of this program to run
-            if (mutex.WaitOne(TimeSpan.Zero, true))
+            if (Mutex.WaitOne(TimeSpan.Zero, true))
             {
                 try
                 {
-                    string version = System.Reflection.Assembly.GetExecutingAssembly()
+                    var version = System.Reflection.Assembly.GetExecutingAssembly()
                                            .GetName()
                                            .Version
                                            .ToString();
-                    log.LogDebugMessage("RPi HomeSecurity Version: " + version);
+                    Log.LogMessage("RPi HomeSecurity Version: " + version);
 
                     if (!Config.IsConfigFilePresent())
                     {
-                        log.LogDebugMessage(
+                        Log.LogMessage(
                             "No config file, creating default. Populate config.cfg with relevant settings");
                         Config.WriteConfigFile(new Config());
                     }
@@ -53,19 +56,17 @@ namespace RPiHomeSecurity
                         var alarm = new Alarm(config);
 
                         //create wamp client
-                        string wampweb = "ws://127.0.0.1:8080/ws";
-                        string realm = "rpihomesecurity";
-                        WampBackend.Instance.Init(wampweb, realm);
+                        WampBackend.Instance.Init(Wampweb, Realm);
 
                         //link up web service
                         WampBackend.Instance.RunActionListHandler += alarm.RunActionList;
-
                         alarm.PublishStatusEventHandler += WampBackend.Instance.PublishRpiSystemStatus;
+                        WampBackend.Instance.GetActionListsHandler += alarm.GetActionLists;
 
                         //try to connect to wamp router every 20 seconds if not already connected
-                        UnixSignal TERMSignal = new UnixSignal(Signum.SIGINT);
-                        DateTime start = DateTime.Now;
-                        while (!TERMSignal.IsSet)
+                        var termSignal = new UnixSignal(Signum.SIGINT);
+                        var start = DateTime.Now;
+                        while (!termSignal.IsSet)
                         {
                             if (!WampBackend.Instance.IsConnected)
                             {
@@ -73,7 +74,7 @@ namespace RPiHomeSecurity
                                 if (interval.TotalSeconds > 20)
                                 {
                                     start = DateTime.Now;
-                                    WampBackend.Instance.Init(wampweb, realm);
+                                    WampBackend.Instance.Init(Wampweb, Realm);
                                 }
                             }
                         }
@@ -84,12 +85,13 @@ namespace RPiHomeSecurity
                 }
                 finally
                 {
-                    mutex.ReleaseMutex();
+                    Mutex.ReleaseMutex();
+                    Log.LogMessage("RPi HomeSecurity exiting");
                 }
             }
             else
             {
-                log.LogDebugMessage("HomeSecurity already running, exiting");
+                Log.LogMessage("HomeSecurity already running, exiting");
             }
         }
     }

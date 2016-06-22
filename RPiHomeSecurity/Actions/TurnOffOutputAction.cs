@@ -7,19 +7,19 @@ namespace RPiHomeSecurity
 {
     internal class TurnOffOutputAction : Action
     {
-        public String output;
+        public String Output;
 
         public TurnOffOutputAction(String output)
         {
-            this.output = output;
+            this.Output = output;
         }
 
-        public override void RunAction(Alarm AlarmController)
+        public override void RunAction(Alarm alarmController)
         {
-            var pin = AlarmController.GetOutputPin(output);
+            var pin = alarmController.GetOutputPin(Output);
             if (pin != null)
             {
-                log.LogDebugMessage("running Output Off Action. On " + pin.Name);
+                Log.LogMessage("running Output Off Action. On " + pin.Name);
                 pin.TurnOff();
             }
         }

@@ -29,12 +29,12 @@ namespace RPiHomeSecurity
             switch (config.IoControllerType)
             {
                 case Config.IoControllerTypes.RawGpio:
-                    log.LogDebugMessage("Using Raw GPIO");
+                    Log.LogMessage("Using Raw GPIO");
                     ioController = new GpioController(IoControllerFactory.GetGpioInputPins(config), IoControllerFactory.GetGpioOutputPins(config));
                     break;
 
                 case Config.IoControllerTypes.PifaceDigital:
-                    log.LogDebugMessage("Using PifaceDigital");
+                    Log.LogMessage("Using PifaceDigital");
                     ioController = new PiFaceIoController(IoControllerFactory.GetPiFaceInputPins(config), IoControllerFactory.GetPiFaceOutputPins(config));
                     break;
 

@@ -23,42 +23,44 @@ namespace RPiHomeSecurity
     {
         public String Name { get; set; }
 
+        protected PinState _pinState;
+        public PinState Value { get { return _pinState; } }
         public int PinNumber { get; set; }
 
-        protected System.Timers.Timer offTimer;
-        protected System.Timers.Timer toggleTimer;
-        protected int numToggles;
-        protected int msToggleOnTime;
-        protected int msToggleOffTime;
-        protected bool isToggleOutputOn;
+        protected System.Timers.Timer OffTimer;
+        protected System.Timers.Timer ToggleTimer;
+        protected int NumToggles;
+        protected int MsToggleOnTime;
+        protected int MsToggleOffTime;
+        protected bool IsToggleOutputOn;
 
         public OutputPin(int pinNumber, String name)
         {
             Name = name;
             PinNumber = pinNumber;
 
-            offTimer = new System.Timers.Timer();
-            offTimer.Elapsed += OffTimerElapsed;
-            offTimer.AutoReset = false;
+            OffTimer = new System.Timers.Timer();
+            OffTimer.Elapsed += OffTimerElapsed;
+            OffTimer.AutoReset = false;
 
-            toggleTimer = new System.Timers.Timer();
-            toggleTimer.Elapsed += ToggleTimerElapsed;
-            toggleTimer.AutoReset = false;
-            numToggles = 0;
+            ToggleTimer = new System.Timers.Timer();
+            ToggleTimer.Elapsed += ToggleTimerElapsed;
+            ToggleTimer.AutoReset = false;
+            NumToggles = 0;
         }
 
         //toggles the output for a number of toggles
         //typically for alarm siren warning
         public void Toggle(int msOnTime, int msOffTime, int numToggles)
         {
-            this.numToggles = numToggles;
-            isToggleOutputOn = true;
+            this.NumToggles = numToggles;
+            IsToggleOutputOn = true;
 
-            msToggleOnTime = msOnTime;
-            msToggleOffTime = msOffTime;
+            MsToggleOnTime = msOnTime;
+            MsToggleOffTime = msOffTime;
 
-            toggleTimer.Interval = msOnTime;
-            toggleTimer.Start();
+            ToggleTimer.Interval = msOnTime;
+            ToggleTimer.Start();
         }
 
         //turn on the output for a length of time
@@ -66,12 +68,12 @@ namespace RPiHomeSecurity
         public void TurnOn(int msDuration)
         {
             //if output is toggling - stop that
-            toggleTimer.Stop();
+            ToggleTimer.Stop();
 
             if (msDuration > 0)
             {
-                offTimer.Interval = msDuration;
-                offTimer.Start();
+                OffTimer.Interval = msDuration;
+                OffTimer.Start();
             }
 
             OutputOn();
@@ -80,8 +82,8 @@ namespace RPiHomeSecurity
         //turn off the output
         public void TurnOff()
         {
-            offTimer.Stop();
-            toggleTimer.Stop();
+            OffTimer.Stop();
+            ToggleTimer.Stop();
 
             OutputOff();
         }
@@ -89,27 +91,27 @@ namespace RPiHomeSecurity
         //the timer's elapsed - turn on / off the output or finish
         private void ToggleTimerElapsed(object sender, ElapsedEventArgs e)
         {
-            if (isToggleOutputOn)
+            if (IsToggleOutputOn)
             {
                 TurnOff();
-                numToggles--;
+                NumToggles--;
             }
 
-            if (numToggles >= 0)
+            if (NumToggles >= 0)
             {
-                if (isToggleOutputOn)
+                if (IsToggleOutputOn)
                 {
-                    toggleTimer.Interval = msToggleOffTime;
-                    toggleTimer.Start();
+                    ToggleTimer.Interval = MsToggleOffTime;
+                    ToggleTimer.Start();
                 }
                 else
                 {
                     OutputOn();
-                    toggleTimer.Interval = msToggleOnTime;
-                    toggleTimer.Start();
+                    ToggleTimer.Interval = MsToggleOnTime;
+                    ToggleTimer.Start();
                 }
 
-                isToggleOutputOn = !isToggleOutputOn;
+                IsToggleOutputOn = !IsToggleOutputOn;
             }
         }
 

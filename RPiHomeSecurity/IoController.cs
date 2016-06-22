@@ -21,7 +21,7 @@ namespace RPiHomeSecurity
 {
     public abstract class IoController
     {
-        public event InputChangedEventHandler inputChangedEventHandler;
+        public event InputChangedEventHandler InputChangedEventHandler;
 
         //outputs
         public Dictionary<String, OutputPin> Outputs { get; set; }
@@ -39,15 +39,15 @@ namespace RPiHomeSecurity
         //one of the inputs changed - pass event on
         public void InputChanged(InputPin pin)
         {
-            if (inputChangedEventHandler != null)
+            if (InputChangedEventHandler != null)
             {
-                inputChangedEventHandler.Invoke(pin);
+                InputChangedEventHandler.Invoke(pin);
             }
         }
 
         public void Toggle(String name, int msOnTime, int msOffTime, int numToggles)
         {
-            OutputPin outPin = Outputs[name];
+            var outPin = Outputs[name];
             if (outPin != null)
             {
                 outPin.Toggle(msOnTime, msOffTime, numToggles);
@@ -56,7 +56,7 @@ namespace RPiHomeSecurity
 
         public void TurnOnOutput(String name, int msDuration)
         {
-            OutputPin outPin = Outputs[name];
+            var outPin = Outputs[name];
             if (outPin != null)
             {
                 outPin.TurnOn(msDuration);
@@ -65,7 +65,7 @@ namespace RPiHomeSecurity
 
         public void TurnOffOutput(String name)
         {
-            OutputPin outPin = Outputs[name];
+            var outPin = Outputs[name];
             if (outPin != null)
             {
                 outPin.TurnOff();
